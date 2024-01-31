@@ -5,7 +5,11 @@ export enum AppSelection {
 }
 
 export function getCurrentApp(urlPath: string): AppSelection {
-  const app = urlPath.split('/').filter(Boolean)[0] || '';
+  const app =
+    urlPath
+      .replace(import.meta.env.VITE_ROOT_PATH, '')
+      .split('/')
+      .filter(Boolean)[0] || '';
 
   if (isValidApp(app)) {
     return app;

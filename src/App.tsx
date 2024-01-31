@@ -86,7 +86,7 @@ function App() {
     <>
       {node.map(({ title, path, children }) => (
         <li key={path}>
-          <Link to={path}>{title}</Link>
+          <Link to={`${import.meta.env.VITE_ROOT_PATH}${path}`}>{title}</Link>
           {children && <ul>{renderNavNode(children)}</ul>}
         </li>
       ))}

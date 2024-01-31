@@ -5,6 +5,8 @@ import NotFound from '@/404.tsx';
 import App from '@/App.tsx';
 import { isValidApp } from '@/lib/app-selection.ts';
 
+const ROOT_PATH = import.meta.env.VITE_ROOT_PATH;
+
 type FSRoutes = Record<string, { default: FunctionComponent }>;
 
 const PAGE_ROUTES: FSRoutes = import.meta.glob('/src/pages/**/[a-z[]*.tsx', { eager: true });
@@ -22,13 +24,13 @@ const pageRoutes = Object.keys(PAGE_ROUTES).map((page) => {
 function AppBoundary({ render }: { render: () => ReactNode }) {
   const { pathname } = useLocation();
 
-  const app = pathname.split('/').filter(Boolean)[0] || '';
+  const app = pathname.replace(ROOT_PATH, '').split('/').filter(Boolean)[0] || '';
   const validApp = isValidApp(app);
 
   if (validApp) {
     return render();
   } else if (app === '') {
-    return <Navigate to="consumer" />;
+    return <Navigate to={import.meta.env.VITE_DEFAULT_APP} />;
   } else {
     // If app is invalid, render 404 component that catches unhandled dynamic routes
     return <NotFound />;
@@ -41,9 +43,9 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route element={<App />}>
-        <Route path="/" element={<AppBoundary render={() => <Outlet />} />}>
+        <Route path={ROOT_PATH} element={<AppBoundary render={() => <Outlet />} />}>
           {pageRoutes.map(({ path, component: Component }) => (
-            <Route key={path} path={path} element={<AppBoundary render={() => <Component />} />} />
+            <Route key={path} path={`${ROOT_PATH}${path}`} element={<AppBoundary render={() => <Component />} />} />
           ))}
           <Route key="not-found" path="*" element={<NotFound />} />
         </Route>
